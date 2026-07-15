@@ -42,7 +42,7 @@ checkable acceptance criteria — no "works well" vibes checks.
     positioned below/beside the punch list per DESIGN.md's layout (never above it).
   - Clicking a punch-list entry highlights its corresponding bar in the chart.
 
-- [ ] **2.2 Third-party byte/time breakdown**
+- [x] **2.2 Third-party byte/time breakdown**
   - The summary panel shows total first-party vs. third-party byte share and time share as
     two distinct figures (not just a combined total).
   - At least one summary stat calls out the largest single contributor by host.
