@@ -83,7 +83,7 @@ checkable acceptance criteria — no "works well" vibes checks.
   - The error/status region uses `aria-live` so a screen reader announces parse errors and
     "report ready" without requiring focus to move.
 
-- [ ] **4.3 Deploy readiness**
+- [x] **4.3 Deploy readiness**
   - `npm run build` output loads correctly when served from a non-root subpath (e.g. via
     `vite preview --base=/waterfall-autopsy/` or an equivalent local check) — no broken
     asset paths.
