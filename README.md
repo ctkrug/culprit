@@ -40,8 +40,12 @@ biggest win is first, with a red case-stamp on the worst offender.
 - **First-party / third-party breakdown** — byte and time share split by party, plus the
   single largest contributing host.
 - **Try a sample case** — no HAR handy? Load a bundled example and see the full report.
-- **Handles malformed input** — a non-JSON file, a non-HAR JSON file, or a HAR with zero
-  entries all produce a plain-English message, never a blank screen or console error.
+- **Copy the punch list** — one click puts a ranked Markdown version of the report on your
+  clipboard, ready to paste into a ticket.
+- **Handles malformed input and large files** — a non-JSON file, a non-HAR JSON file (or a
+  renamed non-HAR file), or a HAR with zero entries all produce a plain-English message, never
+  a blank screen or console error; large HARs (1,000+ entries) show a loading state and
+  analyze in well under a second.
 
 ## Stack
 
