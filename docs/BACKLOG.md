@@ -5,7 +5,7 @@ checkable acceptance criteria — no "works well" vibes checks.
 
 ## Epic 1 — Core autopsy engine (the wow moment)
 
-- [ ] **1.1 Drop a HAR, get the punch list** _(the wow moment — must work end to end first)_
+- [x] **1.1 Drop a HAR, get the punch list** _(the wow moment — must work end to end first)_
   - Dropping or selecting a real HAR file (captured from Chrome DevTools' "Save all as HAR")
     renders a ranked list of offenders within 2 seconds, with no page reload.
   - Each punch-list entry shows a request kind, a plain-English one-line fix referencing its
@@ -13,7 +13,7 @@ checkable acceptance criteria — no "works well" vibes checks.
   - The top offender is visually distinguished from the rest of the list (per DESIGN.md's
     stamp treatment).
 
-- [ ] **1.2 Expand the offender classifier**
+- [x] **1.2 Expand the offender classifier**
   - Tracker detection covers at least 15 known analytics/ads/session-replay hosts, sourced
     from a documented list in the code (not inline magic strings scattered across files).
   - Render-blocking scripts (synchronous `<script>` requests that block first paint, inferred
@@ -21,7 +21,7 @@ checkable acceptance criteria — no "works well" vibes checks.
   - Redirect chains (3xx responses) are attributed to the chain's total time cost, not
     counted as separate low-cost entries.
 
-- [ ] **1.3 Handle malformed and edge-case HAR input without crashing**
+- [x] **1.3 Handle malformed and edge-case HAR input without crashing**
   - Uploading a non-JSON file shows an inline error naming the problem in plain English; the
     app remains usable (no blank screen, no uncaught exception in the console).
   - A HAR with zero entries shows a designed empty state ("no requests captured"), not an
@@ -29,7 +29,7 @@ checkable acceptance criteria — no "works well" vibes checks.
   - A HAR entry missing optional fields (e.g. no `timings`, no `content.size`) is treated as
     zero-cost for that field rather than throwing.
 
-- [ ] **1.4 Tune and document the cost-scoring formula**
+- [x] **1.4 Tune and document the cost-scoring formula**
   - The byte/time cost weighting is documented with a one-paragraph rationale in code
     comments or `docs/VISION.md`.
   - A regression test asserts a known slow-but-small request (high time, low bytes) can
