@@ -82,6 +82,28 @@ describe("toRequestRecords", () => {
     expect(records[0].startMs).toBe(0);
   });
 
+  it("treats an entry missing optional fields as zero-cost rather than throwing", () => {
+    const raw = JSON.stringify({
+      log: {
+        version: "1.2",
+        entries: [
+          {
+            startedDateTime: "2026-01-01T00:00:00.000Z",
+            time: 10,
+            request: { method: "GET", url: "https://example.com/thin" },
+            response: { status: 200 },
+          },
+        ],
+      },
+    });
+
+    const har = parseHar(raw);
+    expect(() => toRequestRecords(har)).not.toThrow();
+    const [record] = toRequestRecords(har);
+    expect(record.bytes).toBe(0);
+    expect(record.mimeType).toBe("application/octet-stream");
+  });
+
   it("keeps the last hop of a redirect chain that never resolves", () => {
     const har: HarFile = {
       log: {
