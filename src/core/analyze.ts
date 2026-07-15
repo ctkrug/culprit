@@ -24,13 +24,19 @@ function isScriptMime(mimeType: string): boolean {
   return mimeType.includes("javascript") || mimeType.includes("ecmascript");
 }
 
+function isVisualAssetMime(mimeType: string): boolean {
+  return mimeType.startsWith("image/") || mimeType.includes("font") || mimeType.includes("css");
+}
+
 // A HAR has no direct signal for a <script>'s async/defer attributes, so
 // render-blocking is inferred from timing position: a script that starts at
-// or before the first non-script asset (image/font/stylesheet) is on the
-// critical path, because the parser hadn't yet moved on to discover other
-// resources. A script that starts later is presumed async/deferred.
-function firstNonScriptStartMs(records: RequestRecord[]): number {
-  const starts = records.filter((r) => !isScriptMime(r.mimeType)).map((r) => r.startMs);
+// or before the first visual asset (image/font/stylesheet) is presumed on
+// the critical path — the parser hadn't yet moved on to fetch page content.
+// The document request itself is deliberately excluded from this baseline
+// (it always starts first and would make the threshold meaningless). If a
+// page has no visual assets at all, every script is treated as blocking.
+function firstVisualAssetStartMs(records: RequestRecord[]): number {
+  const starts = records.filter((r) => isVisualAssetMime(r.mimeType)).map((r) => r.startMs);
   return starts.length > 0 ? Math.min(...starts) : Infinity;
 }
 
@@ -76,7 +82,7 @@ function costOf(record: RequestRecord, totalBytes: number, totalTimeMs: number):
 export function analyze(records: RequestRecord[], topN = 10): AutopsyReport {
   const totalBytes = records.reduce((sum, r) => sum + r.bytes, 0);
   const totalTimeMs = records.reduce((sum, r) => sum + r.timeMs, 0);
-  const renderBlockingThresholdMs = firstNonScriptStartMs(records);
+  const renderBlockingThresholdMs = firstVisualAssetStartMs(records);
 
   const offenders = records
     .map((record) => ({
