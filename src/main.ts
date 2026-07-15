@@ -1,8 +1,18 @@
 import "./app.css";
 import { analyze, type AutopsyReport } from "./core/analyze";
+import { toWaterfallBars } from "./core/chartData";
 import { HarParseError, parseHar, toRequestRecords } from "./core/parseHar";
+import type { RequestRecord } from "./core/types";
+import { destroyWaterfallChart, renderWaterfallChart } from "./chart";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
+
+interface AppState {
+  records?: RequestRecord[];
+  report?: AutopsyReport;
+  error?: string;
+  highlightUrl?: string;
+}
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes}B`;
@@ -16,7 +26,11 @@ function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function render(state: { report?: AutopsyReport; error?: string }) {
+function render(state: AppState) {
+  destroyWaterfallChart();
+
+  const hasChart = Boolean(state.report && state.report.totalRequests > 0 && state.records);
+
   app.innerHTML = `
     <header class="masthead">
       <span class="wordmark">Waterfall<em>Autopsy</em></span>
@@ -37,6 +51,13 @@ function render(state: { report?: AutopsyReport; error?: string }) {
               </label>`
         }
         ${state.error ? `<p class="error" role="alert">${escapeHtml(state.error)}</p>` : ""}
+        ${
+          hasChart
+            ? `<div class="chart-wrap">
+                <canvas class="waterfall-chart" role="img" aria-label="Waterfall chart of every request's start time and duration"></canvas>
+              </div>`
+            : ""
+        }
       </section>
       <section class="punch-list" aria-label="Offender punch list">
         ${
@@ -46,13 +67,18 @@ function render(state: { report?: AutopsyReport; error?: string }) {
               ? state.report.offenders
                   .map(
                     (o, i) => `
-                <article class="offender-card ${i === 0 ? "top-offender" : ""}">
+                <button
+                  type="button"
+                  class="offender-card ${i === 0 ? "top-offender" : ""} ${o.url === state.highlightUrl ? "is-highlighted" : ""}"
+                  data-url="${escapeHtml(o.url)}"
+                  aria-pressed="${o.url === state.highlightUrl}"
+                >
                   ${i === 0 ? `<span class="stamp">TOP OFFENDER</span>` : ""}
                   <span class="kind">${escapeHtml(o.kind)}</span>
                   <p class="url">${escapeHtml(o.url)}</p>
                   <p class="fix">${escapeHtml(o.fix)}</p>
                   <p class="meta">${formatBytes(o.bytes)} · ${Math.round(o.timeMs)}ms</p>
-                </article>`,
+                </button>`,
                   )
                   .join("")
               : `<p class="empty-hint">No case open yet. Drop a HAR file to generate the punch list.</p>`
@@ -60,6 +86,11 @@ function render(state: { report?: AutopsyReport; error?: string }) {
       </section>
     </main>
   `;
+
+  if (hasChart && state.records) {
+    const canvas = document.querySelector<HTMLCanvasElement>(".waterfall-chart");
+    if (canvas) renderWaterfallChart(canvas, toWaterfallBars(state.records), state.highlightUrl);
+  }
 
   const dropzone = document.querySelector<HTMLLabelElement>(".dropzone");
   const input = document.querySelector<HTMLInputElement>("#har-input");
@@ -69,7 +100,7 @@ function render(state: { report?: AutopsyReport; error?: string }) {
       const text = await file.text();
       const har = parseHar(text);
       const records = toRequestRecords(har);
-      render({ report: analyze(records) });
+      render({ records, report: analyze(records) });
     } catch (err) {
       render({ error: err instanceof HarParseError ? err.message : "Couldn't read that file." });
     }
@@ -92,6 +123,13 @@ function render(state: { report?: AutopsyReport; error?: string }) {
     dropzone.classList.remove("dropzone-active");
     const file = event.dataTransfer?.files?.[0];
     if (file) void openCase(file);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".offender-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const url = card.dataset.url;
+      render({ ...state, highlightUrl: state.highlightUrl === url ? undefined : url });
+    });
   });
 }
 
