@@ -44,6 +44,40 @@ describe("analyze", () => {
   });
 });
 
+describe("analyze — first-party/third-party breakdown", () => {
+  it("splits bytes and time between first-party and third-party hosts", () => {
+    const records = [
+      record({ url: "https://example.com/", host: "example.com", bytes: 1_000, timeMs: 100 }),
+      record({ url: "https://cdn.example.com/app.js", host: "cdn.example.com", bytes: 500, timeMs: 50 }),
+      record({ url: "https://tracker.io/pixel.gif", host: "tracker.io", bytes: 200, timeMs: 30 }),
+    ];
+    const report = analyze(records);
+
+    expect(report.firstPartyBytes).toBe(1_500);
+    expect(report.thirdPartyBytes).toBe(200);
+    expect(report.firstPartyTimeMs).toBe(150);
+    expect(report.thirdPartyTimeMs).toBe(30);
+  });
+
+  it("identifies the largest single contributor by host", () => {
+    const records = [
+      record({ url: "https://example.com/", host: "example.com", bytes: 1_000 }),
+      record({ url: "https://tracker.io/a.js", host: "tracker.io", bytes: 200 }),
+      record({ url: "https://tracker.io/b.js", host: "tracker.io", bytes: 5_000 }),
+    ];
+    const report = analyze(records);
+
+    expect(report.largestHostContributor).toEqual({ host: "tracker.io", bytes: 5_200 });
+  });
+
+  it("returns zeroed totals and a null contributor for no requests", () => {
+    const report = analyze([]);
+    expect(report.firstPartyBytes).toBe(0);
+    expect(report.thirdPartyBytes).toBe(0);
+    expect(report.largestHostContributor).toBeNull();
+  });
+});
+
 describe("analyze — cost formula blends bytes and time", () => {
   it("lets a slow-but-small request outrank a large-but-fast cached asset", () => {
     const records = [
