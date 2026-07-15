@@ -37,7 +37,7 @@ checkable acceptance criteria — no "works well" vibes checks.
 
 ## Epic 2 — Report depth and visualization
 
-- [ ] **2.1 Supporting waterfall chart**
+- [x] **2.1 Supporting waterfall chart**
   - A Chart.js horizontal bar/timeline chart renders every request's start time and duration,
     positioned below/beside the punch list per DESIGN.md's layout (never above it).
   - Clicking a punch-list entry highlights its corresponding bar in the chart.
