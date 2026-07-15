@@ -137,6 +137,10 @@
     overflow-x: auto;
     scroll-snap-type: x proximity;
     padding-bottom: var(--space-1);
+    /* Fade the trailing edge so a strip with more chips than fit on
+       screen reads as scrollable instead of looking like the full list. */
+    mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
   }
 
   .stats > div {
