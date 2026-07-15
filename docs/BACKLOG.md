@@ -47,7 +47,7 @@ checkable acceptance criteria — no "works well" vibes checks.
     two distinct figures (not just a combined total).
   - At least one summary stat calls out the largest single contributor by host.
 
-- [ ] **2.3 Design polish pass — report view**
+- [x] **2.3 Design polish pass — report view**
   - Page matches `docs/DESIGN.md` tokens, type pairing, and layout intent at 390px, 768px,
     and 1440px widths with no horizontal scroll or overlap at any of them.
   - Every interactive element (drop zone, punch-list card, chart legend toggle) has themed
