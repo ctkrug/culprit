@@ -31,6 +31,16 @@ function isRedirectStatus(status: number): boolean {
   return status >= 300 && status < 400;
 }
 
+// Entries aren't schema-validated field-by-field, so a numeric field can
+// arrive as a string, null, or anything else from a corrupt/hostile HAR.
+// Math.max(NaN, 0) is NaN, not 0, so non-numeric input must be filtered
+// out before the floor is applied — otherwise it poisons every downstream
+// sum, sort, and displayed figure.
+function safeNonNegative(value: unknown): number {
+  const n = Number(value ?? 0);
+  return Number.isFinite(n) ? Math.max(n, 0) : 0;
+}
+
 // A redirect chain's real cost is the total time until the final resource
 // resolves, not the tiny individual hops — so fold consecutive 3xx entries'
 // time into the request that follows them instead of listing each redirect
@@ -44,7 +54,7 @@ function collapseRedirectChains(entries: HarEntry[]): HarEntry[] {
 
   for (const entry of entries) {
     const status = entry.response?.status ?? 0;
-    const time = Math.max(entry.time ?? 0, 0);
+    const time = safeNonNegative(entry.time);
 
     if (isRedirectStatus(status)) {
       pendingTimeMs += time;
@@ -79,15 +89,14 @@ function hostOf(url: string): string {
 }
 
 function toRecord(entry: HarEntry, startMs: number): RequestRecord {
-  const size = Math.max(entry.response?.content?.size ?? 0, 0);
   return {
     url: entry.request?.url ?? "",
     host: hostOf(entry.request?.url ?? ""),
     method: entry.request?.method ?? "GET",
     status: entry.response?.status ?? 0,
     mimeType: entry.response?.content?.mimeType ?? "application/octet-stream",
-    bytes: size,
-    timeMs: Math.max(entry.time ?? 0, 0),
+    bytes: safeNonNegative(entry.response?.content?.size),
+    timeMs: safeNonNegative(entry.time),
     startMs,
   };
 }
