@@ -32,6 +32,14 @@ function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+// A screen-reader-only status announcement, separate from the visible
+// loading/error text, so "report ready" is heard without moving focus.
+function statusAnnouncement(state: AppState): string {
+  if (state.loading) return "Analyzing case file.";
+  if (state.report) return `Report ready — ${state.report.totalRequests} requests analyzed.`;
+  return "";
+}
+
 function render(state: AppState) {
   destroyWaterfallChart();
 
@@ -42,6 +50,7 @@ function render(state: AppState) {
       <span class="wordmark">Waterfall<em>Autopsy</em></span>
       <span class="tagline">the offenders, not the chart</span>
     </header>
+    <p class="sr-only" role="status" aria-live="polite">${escapeHtml(statusAnnouncement(state))}</p>
     <main class="layout">
       <section class="case-panel" aria-label="Case file summary">
         ${
