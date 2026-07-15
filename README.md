@@ -1,5 +1,7 @@
 # Waterfall Autopsy
 
+[![CI](https://github.com/ctkrug/waterfall-autopsy/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/waterfall-autopsy/actions/workflows/ci.yml)
+
 Drop in a `.har` network export and get an **autopsy report**, not a waterfall chart.
 
 Most HAR viewers hand you a timeline and leave the interpretation to you. Waterfall Autopsy
