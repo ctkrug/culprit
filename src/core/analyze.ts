@@ -13,10 +13,20 @@ export interface Offender {
   fix: string;
 }
 
+export interface HostContribution {
+  host: string;
+  bytes: number;
+}
+
 export interface AutopsyReport {
   totalRequests: number;
   totalBytes: number;
   totalTimeMs: number;
+  firstPartyBytes: number;
+  thirdPartyBytes: number;
+  firstPartyTimeMs: number;
+  thirdPartyTimeMs: number;
+  largestHostContributor: HostContribution | null;
   offenders: Offender[];
 }
 
@@ -71,6 +81,52 @@ function fixFor(kind: OffenderKind, record: RequestRecord): string {
   }
 }
 
+// Naive base-domain check (last two dot-separated labels) rather than a full
+// public-suffix-list lookup — good enough to tell "cdn.example.com" apart
+// from "doubleclick.net", the case that actually matters for this report.
+// Known limitation: mis-splits multi-part TLDs like "example.co.uk".
+function baseDomain(host: string): string {
+  const parts = host.split(".").filter(Boolean);
+  return parts.length <= 2 ? host : parts.slice(-2).join(".");
+}
+
+// The first request chronologically is assumed to be the page's own
+// document — every other request is first-party if it shares that
+// document's base domain, third-party otherwise.
+function partyBreakdown(records: RequestRecord[]) {
+  const siteHost = records[0]?.host ?? "";
+  let firstPartyBytes = 0;
+  let thirdPartyBytes = 0;
+  let firstPartyTimeMs = 0;
+  let thirdPartyTimeMs = 0;
+
+  for (const record of records) {
+    if (baseDomain(record.host) === baseDomain(siteHost)) {
+      firstPartyBytes += record.bytes;
+      firstPartyTimeMs += record.timeMs;
+    } else {
+      thirdPartyBytes += record.bytes;
+      thirdPartyTimeMs += record.timeMs;
+    }
+  }
+
+  return { firstPartyBytes, thirdPartyBytes, firstPartyTimeMs, thirdPartyTimeMs };
+}
+
+function largestHostContributor(records: RequestRecord[]): HostContribution | null {
+  const bytesByHost = new Map<string, number>();
+  for (const record of records) {
+    if (!record.host) continue;
+    bytesByHost.set(record.host, (bytesByHost.get(record.host) ?? 0) + record.bytes);
+  }
+
+  let largest: HostContribution | null = null;
+  for (const [host, bytes] of bytesByHost) {
+    if (!largest || bytes > largest.bytes) largest = { host, bytes };
+  }
+  return largest;
+}
+
 // Cost blends bytes and time so a huge-but-cached asset and a small-but-slow
 // one can both surface — pure byte size alone misses render-blocking scripts.
 function costOf(record: RequestRecord, totalBytes: number, totalTimeMs: number): number {
@@ -101,10 +157,17 @@ export function analyze(records: RequestRecord[], topN = 10): AutopsyReport {
       fix: fixFor(kind, record),
     }));
 
+  const { firstPartyBytes, thirdPartyBytes, firstPartyTimeMs, thirdPartyTimeMs } = partyBreakdown(records);
+
   return {
     totalRequests: records.length,
     totalBytes,
     totalTimeMs,
+    firstPartyBytes,
+    thirdPartyBytes,
+    firstPartyTimeMs,
+    thirdPartyTimeMs,
+    largestHostContributor: largestHostContributor(records),
     offenders,
   };
 }
