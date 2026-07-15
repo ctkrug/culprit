@@ -49,3 +49,48 @@ describe("main — copy-status toast timeout", () => {
     expect(vi.getTimerCount()).toBe(1);
   });
 });
+
+describe("main — untrusted HAR content rendering", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.useFakeTimers();
+    document.body.innerHTML = '<div id="app"></div>';
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("escapes an XSS payload embedded in a HAR request URL instead of rendering it as markup", async () => {
+    await import("../main");
+
+    const maliciousUrl = 'https://evil.example.com/"><img src=x onerror=alert(1)>.js';
+    const har = JSON.stringify({
+      log: {
+        version: "1.2",
+        entries: [
+          {
+            startedDateTime: "2026-01-01T00:00:00.000Z",
+            time: 10,
+            request: { method: "GET", url: maliciousUrl },
+            response: {
+              status: 200,
+              content: { size: 100, mimeType: "application/javascript" },
+              headersSize: 0,
+              bodySize: 0,
+            },
+          },
+        ],
+      },
+    });
+    const file = new File([har], "evil.har", { type: "application/json" });
+    const input = document.querySelector<HTMLInputElement>("#har-input")!;
+    Object.defineProperty(input, "files", { value: [file], configurable: true });
+    input.dispatchEvent(new Event("change"));
+
+    await vi.advanceTimersByTimeAsync(50); // flush file.text() + the rAF yield in openCase()
+
+    expect(document.querySelector(".offender-card img")).toBeNull();
+    expect(document.querySelector(".offender-card .url")?.textContent).toBe(maliciousUrl);
+  });
+});
