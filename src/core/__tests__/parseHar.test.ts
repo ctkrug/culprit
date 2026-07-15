@@ -32,6 +32,14 @@ describe("parseHar", () => {
   it("rejects JSON that isn't a HAR file", () => {
     expect(() => parseHar(JSON.stringify({ foo: "bar" }))).toThrow(HarParseError);
   });
+
+  it("rejects a non-HAR binary file (e.g. an image renamed to .har) via the same error path", () => {
+    // A renamed .png read as text decodes to a PNG signature + binary noise —
+    // never valid JSON, so it hits the same plain-English error as any other
+    // malformed input rather than a distinct silent failure.
+    const fakePngAsText = "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00";
+    expect(() => parseHar(fakePngAsText)).toThrow(HarParseError);
+  });
 });
 
 describe("toRequestRecords", () => {
