@@ -77,7 +77,7 @@ checkable acceptance criteria — no "works well" vibes checks.
     Safari (or documented structural differences between them), and all three parse without
     error.
 
-- [ ] **4.2 Accessibility pass**
+- [x] **4.2 Accessibility pass**
   - Full keyboard navigation reaches every control (drop zone, punch-list cards, chart
     toggle, copy button) in a sane tab order with visible focus at each stop.
   - The error/status region uses `aria-live` so a screen reader announces parse errors and
