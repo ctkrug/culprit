@@ -53,9 +53,15 @@ modules that touch the DOM/Chart.js.
 
 ## Tests
 
-`src/core/__tests__/*.test.ts` cover every pure module above via Vitest. `main.ts`/`chart.ts`
-are exercised manually (Playwright-driven smoke pass during BUILD/QA), not by the automated
-suite — there's no jsdom dependency yet.
+`src/core/__tests__/*.test.ts` cover every pure module above via Vitest, at 100% line coverage.
+`src/__tests__/main.test.ts` covers `main.ts`'s DOM/event wiring under a jsdom environment
+(`// @vitest-environment jsdom` per-file pragma, with `../chart` mocked out since jsdom has no
+real canvas 2D context) — currently just the copy-toast timer regression below, not full
+coverage of `main.ts`. Visual/interaction QA (layout, chart rendering, a11y tab order) is still
+a manual Playwright-driven smoke pass during BUILD/QA, not part of the automated suite.
+
+Run `npm test -- --coverage` (needs `@vitest/coverage-v8`, already a devDependency) to see the
+per-file breakdown.
 
 ## Cross-browser HAR differences
 
@@ -69,9 +75,10 @@ each browser's HAR export actually has, exercised by `crossBrowser.test.ts`:
 - **Safari** (Web Inspector export): reports `-1` ("unknown") for `content.size`,
   `headersSize`, and `bodySize` instead of omitting them, and ships a sparser `timings` object.
 
-`parseHar.ts`'s `toRecord()` already guards every numeric field with `Math.max(value ?? 0, 0)`,
-which absorbs both the missing-field pattern (Firefox/Chrome) and the negative-sentinel
-pattern (Safari) without browser-specific branching.
+`parseHar.ts`'s `toRecord()` already guards every numeric field through `safeNonNegative()`,
+which coerces to a finite number and floors at zero — absorbing the missing-field pattern
+(Firefox/Chrome), the negative-sentinel pattern (Safari), and non-numeric/NaN-producing
+fields from a corrupt or hostile HAR, all without browser-specific branching.
 
 ## Running it
 
