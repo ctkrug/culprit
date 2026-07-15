@@ -55,7 +55,7 @@ checkable acceptance criteria — no "works well" vibes checks.
 
 ## Epic 3 — Usability
 
-- [ ] **3.1 Sample HAR for first-time users**
+- [x] **3.1 Sample HAR for first-time users**
   - A "try a sample case" control loads a bundled example HAR and produces a full punch list
     without requiring the user to have their own file.
   - The sample is real enough to exercise at least three distinct offender kinds.
