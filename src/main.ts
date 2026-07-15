@@ -9,6 +9,11 @@ import { sampleCaseHar } from "./sampleCase";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
+// Tracks the toast's pending auto-hide so a fast follow-up render (e.g.
+// highlighting a card while "Copied!" is still showing) replaces it instead
+// of arming a second timer alongside a now-stale one.
+let copyStatusTimer: ReturnType<typeof setTimeout> | undefined;
+
 type CopyStatus = "idle" | "copied" | "failed";
 
 interface AppState {
@@ -199,8 +204,9 @@ function render(state: AppState) {
       .catch(() => render({ ...state, copyStatus: "failed" }));
   });
 
+  clearTimeout(copyStatusTimer);
   if (state.copyStatus) {
-    setTimeout(() => render({ ...state, copyStatus: undefined }), 1800);
+    copyStatusTimer = setTimeout(() => render({ ...state, copyStatus: undefined }), 1800);
   }
 }
 
