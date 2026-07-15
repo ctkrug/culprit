@@ -137,6 +137,15 @@
   min-height: 60vh;
 }
 
+.punch-list-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.copy-report-btn {
+  font-size: 0.85rem;
+}
+
 .empty-hint {
   color: var(--text-muted);
   margin: auto;
