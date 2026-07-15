@@ -72,7 +72,7 @@ checkable acceptance criteria — no "works well" vibes checks.
 
 ## Epic 4 — Ship hardening
 
-- [ ] **4.1 Cross-browser HAR compatibility**
+- [x] **4.1 Cross-browser HAR compatibility**
   - Test fixtures include at least one HAR export shape each from Chrome, Firefox, and
     Safari (or documented structural differences between them), and all three parse without
     error.
