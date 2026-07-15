@@ -17,6 +17,7 @@ interface AppState {
   error?: string;
   highlightUrl?: string;
   copyStatus?: CopyStatus;
+  loading?: boolean;
 }
 
 function formatBytes(bytes: number): string {
@@ -44,8 +45,13 @@ function render(state: AppState) {
     <main class="layout">
       <section class="case-panel" aria-label="Case file summary">
         ${
-          state.report
-            ? `<dl class="stats">
+          state.loading
+            ? `<div class="loading-state" role="status" aria-live="polite">
+                <span class="spinner" aria-hidden="true"></span>
+                <p>Analyzing case file&hellip;</p>
+              </div>`
+            : state.report
+              ? `<dl class="stats">
                 <div><dt>Requests</dt><dd>${state.report.totalRequests}</dd></div>
                 <div><dt>Total size</dt><dd>${formatBytes(state.report.totalBytes)}</dd></div>
                 <div><dt>Total time</dt><dd>${Math.round(state.report.totalTimeMs)}ms</dd></div>
@@ -89,12 +95,14 @@ function render(state: AppState) {
             : ""
         }
         ${
-          state.report && state.report.totalRequests === 0
-            ? `<p class="empty-hint">No requests captured in this HAR — there's nothing to autopsy.</p>`
-            : state.report
-              ? state.report.offenders
-                  .map(
-                    (o, i) => `
+          state.loading
+            ? `<p class="empty-hint">Reading the case file&hellip;</p>`
+            : state.report && state.report.totalRequests === 0
+              ? `<p class="empty-hint">No requests captured in this HAR — there's nothing to autopsy.</p>`
+              : state.report
+                ? state.report.offenders
+                    .map(
+                      (o, i) => `
                 <button
                   type="button"
                   class="offender-card ${i === 0 ? "top-offender" : ""} ${o.url === state.highlightUrl ? "is-highlighted" : ""}"
@@ -107,9 +115,9 @@ function render(state: AppState) {
                   <p class="fix">${escapeHtml(o.fix)}</p>
                   <p class="meta">${formatBytes(o.bytes)} · ${Math.round(o.timeMs)}ms</p>
                 </button>`,
-                  )
-                  .join("")
-              : `<p class="empty-hint">No case open yet. Drop a HAR file to generate the punch list.</p>`
+                    )
+                    .join("")
+                : `<p class="empty-hint">No case open yet. Drop a HAR file to generate the punch list.</p>`
         }
       </section>
     </main>
@@ -124,8 +132,12 @@ function render(state: AppState) {
   const input = document.querySelector<HTMLInputElement>("#har-input");
 
   async function openCase(file: File) {
+    render({ loading: true });
     try {
       const text = await file.text();
+      // Yield to the browser so the loading state actually paints before the
+      // synchronous parse/classify/rank work below runs on large HAR files.
+      await new Promise((resolve) => requestAnimationFrame(resolve));
       const har = parseHar(text);
       const records = toRequestRecords(har);
       render({ records, report: analyze(records) });
