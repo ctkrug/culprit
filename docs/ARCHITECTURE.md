@@ -54,6 +54,8 @@ modules that touch the DOM/Chart.js.
 ## Tests
 
 `src/core/__tests__/*.test.ts` cover every pure module above via Vitest, at 100% line coverage.
+`parseHar.property.test.ts` and `analyze.property.test.ts` add fast-check property tests over
+arbitrary (including malformed) input, on top of the hand-picked example tests.
 `src/__tests__/main.test.ts` covers `main.ts`'s DOM/event wiring under a jsdom environment
 (`// @vitest-environment jsdom` per-file pragma, with `../chart` mocked out since jsdom has no
 real canvas 2D context) — currently just the copy-toast timer regression below, not full
