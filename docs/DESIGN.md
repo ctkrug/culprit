@@ -1,14 +1,14 @@
-# Design direction — Waterfall Autopsy
+# Design direction — Culprit
 
 ## 1. Aesthetic direction
 
-**Forensic case file.** The product's own name is "autopsy" — lean into it literally instead
-of building another dark-mode dev-tool dashboard. The page reads like a case file pulled from
-a manila folder: warm paper background, typewriter case-stamp headlines, monospace data rows,
-and a red ink stamp that lands on the worst offender when a report finishes. This is a
-deliberate departure from the glassy-dark/terminal-mono look most performance tools default
-to — it fits a tool whose entire pitch is "we did the interpretation for you," which reads as
-a completed investigation, not a live dashboard.
+**Forensic case file.** Culprit's whole job is to name the guilty request, so the page reads
+like a case file pulled from a manila folder instead of another dark-mode dev-tool dashboard:
+warm paper background, typewriter case-stamp headlines, monospace data rows, and a red ink
+stamp that lands on the worst offender when a report finishes. This is a deliberate departure
+from the glassy-dark/terminal-mono look most performance tools default to. It fits a tool
+whose entire pitch is "we did the interpretation for you," which reads as a completed
+investigation, not a live dashboard.
 
 ## 2. Tokens
 
@@ -63,6 +63,6 @@ as flat digital color.
 
 ## 5. Games/toys juice plan
 
-Not applicable — Waterfall Autopsy is a data tool, not a game. (Motion/feedback rules under
+Not applicable — Culprit is a data tool, not a game. (Motion/feedback rules under
 D2 of the shared design standard still apply: every control gets hover/focus/active states,
 and the stamp/report-complete moment gets a real transition rather than an instant swap.)
