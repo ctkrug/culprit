@@ -1,6 +1,7 @@
 import "./app.css";
 import { analyze, type AutopsyReport } from "./core/analyze";
 import { toWaterfallBars } from "./core/chartData";
+import { formatBytes } from "./core/format";
 import { formatPunchListMarkdown } from "./core/formatReport";
 import { HarParseError, parseHar, toRequestRecords } from "./core/parseHar";
 import type { RequestRecord } from "./core/types";
@@ -31,12 +32,6 @@ interface AppState {
   highlightUrl?: string;
   copyStatus?: CopyStatus;
   loading?: boolean;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
 // HAR content (URLs, mime types) is untrusted input rendered via innerHTML —

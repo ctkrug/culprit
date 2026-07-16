@@ -1,10 +1,5 @@
 import type { AutopsyReport } from "./analyze";
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
-}
+import { formatBytes } from "./format";
 
 // Plain-text/Markdown punch list for the "copy report" action — a ranked
 // list a PM can paste straight into a ticket, not a JSON dump.
