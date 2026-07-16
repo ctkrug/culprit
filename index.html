@@ -3,15 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Waterfall Autopsy — HAR report, not a chart</title>
+    <title>Culprit: analyze a HAR file and find what's slowing your page</title>
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23F4EFE6'/%3E%3Ccircle cx='32' cy='32' r='26' fill='none' stroke='%23B3241C' stroke-width='4'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='30' font-weight='700' text-anchor='middle' fill='%23B3241C'%3EW%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23F4EFE6'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23B3241C' stroke-width='6'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23B3241C'/%3E%3C/svg%3E"
     />
     <meta
       name="description"
-      content="Drop in a .har network export and get an opinionated autopsy report: the specific images, scripts, and trackers costing you load time."
+      content="Culprit reads a .har network export and names the images, scripts, and trackers slowing your page. A free HAR file viewer that runs entirely in your browser."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Culprit: analyze a HAR file and find what's slowing your page" />
+    <meta
+      property="og:description"
+      content="Drop a .har file and get a ranked punch list of what's costing you load time, with a one-line fix for each. Runs client-side; the file never leaves your browser."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,6 +29,70 @@
   </head>
   <body>
     <div id="app"></div>
+
+    <section class="seo" aria-label="About Culprit">
+      <div class="seo-inner">
+        <h2>Analyze a HAR file online, without uploading it</h2>
+        <p class="seo-lede">
+          Culprit is a website waterfall analyzer that reads a <code>.har</code> network export and tells you
+          which requests are slowing the page down. Most tools stop at a waterfall chart and leave the reading
+          to you. Culprit does the reading: it ranks every image, script, font, and third-party tracker by how
+          much load time it costs, and writes a one-line fix for the worst offenders. Everything runs in your
+          browser, so the file never leaves your machine.
+        </p>
+
+        <div class="faq">
+          <h3>Frequently asked questions</h3>
+          <dl>
+            <dt>How do I analyze a HAR file online?</dt>
+            <dd>
+              Export a <code>.har</code> file from your browser's network panel, then drop it onto the page
+              above. Culprit parses it locally and returns a ranked punch list in about a second. There is no
+              sign-up and no upload step.
+            </dd>
+
+            <dt>Is Culprit a HAR file viewer?</dt>
+            <dd>
+              It is a HAR file viewer with an opinion. A plain viewer replays the waterfall you already saw in
+              DevTools. Culprit reads that same data and points at the specific requests worth fixing first,
+              with the byte size and time cost for each.
+            </dd>
+
+            <dt>What is a website waterfall analyzer?</dt>
+            <dd>
+              A waterfall analyzer looks at the timeline of every request a page makes and works out where the
+              load time actually goes. Culprit adds the interpretation step: it splits first-party from
+              third-party bytes, names the single largest host, and flags render-blocking scripts and
+              oversized images by name.
+            </dd>
+
+            <dt>Does my HAR file get uploaded anywhere?</dt>
+            <dd>
+              No. Parsing happens entirely in your browser with client-side JavaScript. HAR files often
+              contain internal URLs and header data, so keeping the file on your machine is the only safe
+              default. You can confirm this by reading the source on GitHub.
+            </dd>
+
+            <dt>How do I capture a HAR file to analyze?</dt>
+            <dd>
+              In Chrome or Edge, open DevTools, go to the Network tab, reload the page, then right-click any
+              request and choose "Save all as HAR." Firefox and Safari have the same export in their network
+              panels. Culprit reads exports from all three.
+            </dd>
+          </dl>
+        </div>
+
+        <div class="seo-cta">
+          <a class="cta-btn" href="https://github.com/ctkrug/waterfall-autopsy">View on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="site-footer-name">Culprit</span>
+      <a href="https://apps.charliekrug.com">More by Charlie Krug → apps.charliekrug.com</a>
+    </footer>
+
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

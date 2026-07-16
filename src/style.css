@@ -104,6 +104,113 @@ button:disabled {
   white-space: nowrap;
 }
 
+/* Below-the-fold marketing + search copy. Lives outside #app (which the
+   renderer owns) so it survives every re-render and is present in the static
+   HTML. Same tokens as the app, so page and product read as one brand. */
+.seo {
+  background: var(--surface-2);
+  border-top: 2px solid var(--text);
+  padding: var(--space-6) var(--space-3);
+}
+
+.seo-inner {
+  max-width: 68ch;
+  margin: 0 auto;
+}
+
+.seo h2 {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 400;
+  margin: 0 0 var(--space-2);
+}
+
+.seo-lede {
+  color: var(--text);
+  margin: 0 0 var(--space-4);
+}
+
+.seo code {
+  background: var(--surface-1);
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius);
+  padding: 1px 5px;
+  font-size: 0.9em;
+}
+
+.faq h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.faq dt {
+  font-weight: 600;
+  margin-top: var(--space-3);
+}
+
+.faq dd {
+  margin: var(--space-1) 0 0;
+  color: var(--text);
+}
+
+.seo-cta {
+  margin-top: var(--space-4);
+}
+
+.cta-btn {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--surface-1);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-3);
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--motion),
+    box-shadow var(--motion);
+}
+
+.cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgba(33, 29, 24, 0.1),
+    0 8px 20px rgba(33, 29, 24, 0.14);
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface-1);
+  border-top: 1px solid var(--surface-2);
+  font-size: 0.9rem;
+}
+
+.site-footer-name {
+  font-family: var(--font-display);
+  color: var(--accent);
+}
+
+.site-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--accent-support);
+  text-decoration: underline;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
